@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -42,9 +43,6 @@ func (c *Client) Login(email, password string) error {
         password: password,
     }
 
-    //     BODY="{\"email\": \"$EMAIL\", \"password\": \"$PASSWORD\"}"
-    //
-    // /usr/bin/curl -c cookie-jar.txt -X POST -H 'Content-Type: application/json' --data "$BODY" https://members-ng.iracing.com/auth
     reqBody := bytes.NewBuffer([]byte(fmt.Sprintf("{\"email\": \"%s\", \"password\": \"%s\"}", loginRequest.email, loginRequest.password)))
     req, err := http.NewRequest("POST", uri, reqBody)
 
@@ -60,6 +58,10 @@ func (c *Client) Login(email, password string) error {
     }
 
     defer resp.Body.Close()
+
+    if resp.StatusCode != http.StatusOK {
+        return fmt.Errorf("Login failed with statuscode %d", resp.StatusCode)
+    }
 
     return nil
 }
