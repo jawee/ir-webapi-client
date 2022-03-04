@@ -10,6 +10,8 @@ import (
 	"net/http/cookiejar"
 	"net/http/httputil"
 	"time"
+
+	"github.com/jawee/ir-webapi-client/client/response"
 )
 
 type Client struct {
@@ -27,11 +29,6 @@ func New() *Client {
     }
 }
 
-type loginRequest struct {
-    email string
-    password string
-}
-
 func (c *Client) Login(email, password string) error {
     uri := "https://members-ng.iracing.com/auth"
 
@@ -39,12 +36,7 @@ func (c *Client) Login(email, password string) error {
         Jar: c.CookieJar,
     }
 
-    loginRequest := loginRequest{
-        email: email,
-        password: password,
-    }
-
-    reqBody := bytes.NewBuffer([]byte(fmt.Sprintf("{\"email\": \"%s\", \"password\": \"%s\"}", loginRequest.email, loginRequest.password)))
+    reqBody := bytes.NewBuffer([]byte(fmt.Sprintf("{\"email\": \"%s\", \"password\": \"%s\"}", email, password)))
     req, err := http.NewRequest("POST", uri, reqBody)
 
     if err != nil {
@@ -63,19 +55,14 @@ func (c *Client) Login(email, password string) error {
     var respMap map[string]interface{}
     err = json.NewDecoder(resp.Body).Decode(&respMap)
 
-    log.Printf("%v\n", respMap)
-
     if err != nil {
-        log.Println(err)
         return err
     }
 
     if respMap["authcode"] == 0.0 {
-        log.Printf("Login failed: %s\n", respMap["message"])
         return fmt.Errorf("Login failed: %s\n", respMap["message"])
     }
 
-    log.Println("Login successful")
     return nil
 }
 
@@ -96,6 +83,68 @@ func printResp(resp *http.Response) {
     }
 
     fmt.Printf("RESPONSE:\n%s", string(respDump))
+}
+
+
+
+func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
+
+    client := &http.Client{
+        Jar: c.CookieJar,
+    }
+
+    req, err := http.NewRequest("GET", uri, nil)
+
+    if err != nil {
+        return nil, err
+    }
+
+    resp, err := client.Do(req)
+
+    if err != nil {
+        return nil, err
+    }
+
+    defer resp.Body.Close()
+
+    b, err := io.ReadAll(resp.Body)
+    
+
+    var linkResp response.LinkResponse
+    err = json.Unmarshal(b, &linkResp)
+    
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+    return &linkResp, nil;
+}
+
+func (c *Client) fetchLink(uri string, resp interface{}) error {
+    client := &http.Client{
+        Jar: c.CookieJar,
+    }
+
+    req, err := http.NewRequest("GET", uri, nil)
+    if err != nil {
+        return nil
+    }
+
+    res, err := client.Do(req)
+    if err != nil {
+        return nil
+    }
+
+    defer res.Body.Close()
+
+    b, err := io.ReadAll(res.Body)
+
+    err = json.Unmarshal(b, resp)
+    if err != nil {
+        return nil
+    }
+
+    return nil
 }
 
 
@@ -189,36 +238,20 @@ func (c *Client) GetMember(custId int) error {
 //     }
 //   }
 // }
-func (c *Client) GetMemberRecentRaces(custId int) error {
-    uri := "https://members-ng.iracing.com/data/stats/member_recent_races"
+func (c *Client) GetMemberRecentRaces(custId int) (*response.RecentRacesResponse, error) {
+    uri := fmt.Sprintf("https://members-ng.iracing.com/data/stats/member_recent_races?cust_id=%d", custId)
 
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
-
-    req, err := http.NewRequest("GET", uri, nil)
-
+    linkResp, err := c.getLink(uri) 
     if err != nil {
-        return err
+        log.Fatalln(err)
     }
 
-    req.URL.RawQuery = fmt.Sprintf("cust_id=%d", custId)
-
-    resp, err := client.Do(req)
-
-    if err != nil {
-        return err
-    }
-
-    defer resp.Body.Close()
-
-    b, err := io.ReadAll(resp.Body)
+    var memberRecentRacesResp response.RecentRacesResponse
+    err = c.fetchLink(linkResp.Link, &memberRecentRacesResp)
 
     if err != nil {
         log.Fatalln(err)
     }
 
-    fmt.Println(string(b))
-
-    return nil;
+    return &memberRecentRacesResp, nil;
 }
