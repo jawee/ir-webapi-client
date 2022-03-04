@@ -2,12 +2,13 @@ package client
 
 import (
 	"bytes"
-	"errors"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/http/cookiejar"
+	"net/http/httputil"
 	"time"
 )
 
@@ -54,16 +55,47 @@ func (c *Client) Login(email, password string) error {
     resp, err := client.Do(req)
 
     if err != nil {
+        log.Println(err)
         return err
     }
 
     defer resp.Body.Close()
+    var respMap map[string]interface{}
+    err = json.NewDecoder(resp.Body).Decode(&respMap)
 
-    if resp.StatusCode != http.StatusOK {
-        return fmt.Errorf("Login failed with statuscode %d", resp.StatusCode)
+    log.Printf("%v\n", respMap)
+
+    if err != nil {
+        log.Println(err)
+        return err
     }
 
+    if respMap["authcode"] == 0.0 {
+        log.Printf("Login failed: %s\n", respMap["message"])
+        return fmt.Errorf("Login failed: %s\n", respMap["message"])
+    }
+
+    log.Println("Login successful")
     return nil
+}
+
+func printBody(body io.ReadCloser) {
+    b, err := io.ReadAll(body)
+
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+    fmt.Println(string(b))
+}
+
+func printResp(resp *http.Response) {
+    respDump, err := httputil.DumpResponse(resp, true)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("RESPONSE:\n%s", string(respDump))
 }
 
 
