@@ -23,7 +23,6 @@ func New() *Client {
 
     jar, _ := cookiejar.New(nil)
 
-
     return &Client{
         CookieJar: jar,
     }
@@ -85,8 +84,6 @@ func printResp(resp *http.Response) {
     fmt.Printf("RESPONSE:\n%s", string(respDump))
 }
 
-
-
 func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
 
     client := &http.Client{
@@ -147,8 +144,6 @@ func (c *Client) fetchLink(uri string, resp interface{}) error {
     return nil
 }
 
-
-// /usr/bin/curl -b cookie-jar.txt -c cookie-jar.txt  https://members-ng.iracing.com/data/results/get?subsession_id=38280997
 func (c *Client) GetSession(subsessionId int) error {
     uri := fmt.Sprintf("https://members-ng.iracing.com/data/results/get?subsession_id=%d", subsessionId)
 
@@ -171,7 +166,6 @@ func (c *Client) GetSession(subsessionId int) error {
     defer resp.Body.Close()
 
     b, err := io.ReadAll(resp.Body)
-	// b, err := ioutil.ReadAll(resp.Body)  Go.1.15 and earlier
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -181,77 +175,3 @@ func (c *Client) GetSession(subsessionId int) error {
     return nil;
 }
 
-// {
-//   "link": "https://members-ng.iracing.com/data/member/get",
-//   "parameters": {
-//     "cust_ids": {
-//       "type": "numbers",
-//       "required": true,
-//       "note": "?cust_ids=2,3,4"
-//     },
-//     "include_licenses": {
-//       "type": "boolean"
-//     }
-//   }
-// }
-func (c *Client) GetMember(custId int) error {
-    uri := "https://members-ng.iracing.com/data/member/get"
-
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
-
-    req, err := http.NewRequest("GET", uri, nil)
-
-    if err != nil {
-        return err
-    }
-
-    req.URL.RawQuery = fmt.Sprintf("cust_ids=%d", custId)
-
-    resp, err := client.Do(req)
-
-    if err != nil {
-        return err
-    }
-
-    defer resp.Body.Close()
-
-    b, err := io.ReadAll(resp.Body)
-
-    if err != nil {
-        log.Fatalln(err)
-    }
-
-    fmt.Println(string(b))
-
-    return nil;
-}
-
-
-// {
-//   "link": "https://members-ng.iracing.com/data/stats/member_recent_races",
-//   "parameters": {
-//     "cust_id": {
-//       "type": "number",
-//       "note": "Defaults to the authenticated member."
-//     }
-//   }
-// }
-func (c *Client) GetMemberRecentRaces(custId int) (*response.RecentRacesResponse, error) {
-    uri := fmt.Sprintf("https://members-ng.iracing.com/data/stats/member_recent_races?cust_id=%d", custId)
-
-    linkResp, err := c.getLink(uri) 
-    if err != nil {
-        log.Fatalln(err)
-    }
-
-    var memberRecentRacesResp response.RecentRacesResponse
-    err = c.fetchLink(linkResp.Link, &memberRecentRacesResp)
-
-    if err != nil {
-        log.Fatalln(err)
-    }
-
-    return &memberRecentRacesResp, nil;
-}
