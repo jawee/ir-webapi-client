@@ -15,6 +15,7 @@ import (
 )
 
 type Client struct {
+    Client *http.Client
 	CookieJar *cookiejar.Jar
 	loginTime time.Time
 }
@@ -22,18 +23,18 @@ type Client struct {
 func New() *Client {
 
     jar, _ := cookiejar.New(nil)
+    client := &http.Client{}
 
     return &Client{
         CookieJar: jar,
+        Client: client,
     }
 }
 
 func (c *Client) Login(email, password string) error {
     uri := "https://members-ng.iracing.com/auth"
 
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
+    c.Client.Jar = c.CookieJar
 
     reqBody := bytes.NewBuffer([]byte(fmt.Sprintf("{\"email\": \"%s\", \"password\": \"%s\"}", email, password)))
     req, err := http.NewRequest("POST", uri, reqBody)
@@ -43,7 +44,7 @@ func (c *Client) Login(email, password string) error {
     }
     req.Header.Add("Content-Type", "application/json")
 
-    resp, err := client.Do(req)
+    resp, err := c.Client.Do(req)
 
     if err != nil {
         log.Println(err)
@@ -86,9 +87,7 @@ func printResp(resp *http.Response) {
 
 func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
 
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
+    c.Client.Jar = c.CookieJar
 
     req, err := http.NewRequest("GET", uri, nil)
 
@@ -96,7 +95,7 @@ func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
         return nil, err
     }
 
-    resp, err := client.Do(req)
+    resp, err := c.Client.Do(req)
 
     if err != nil {
         return nil, err
@@ -118,16 +117,14 @@ func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
 }
 
 func (c *Client) fetchLink(uri string, resp interface{}) error {
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
+    c.Client.Jar = c.CookieJar
 
     req, err := http.NewRequest("GET", uri, nil)
     if err != nil {
         return nil
     }
 
-    res, err := client.Do(req)
+    res, err := c.Client.Do(req)
     if err != nil {
         return nil
     }

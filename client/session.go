@@ -9,10 +9,7 @@ import (
 
 func (c *Client) GetSession(subsessionId int) error {
     uri := fmt.Sprintf("https://members-ng.iracing.com/data/results/get?subsession_id=%d", subsessionId)
-
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
+    c.Client.Jar = c.CookieJar
 
     req, err := http.NewRequest("GET", uri, nil)
 
@@ -20,7 +17,7 @@ func (c *Client) GetSession(subsessionId int) error {
         return err
     }
 
-    resp, err := client.Do(req)
+    resp, err := c.Client.Do(req)
 
     if err != nil {
         return err

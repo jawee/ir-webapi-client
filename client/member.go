@@ -12,9 +12,7 @@ import (
 func (c *Client) GetMember(custId int) error {
     uri := "https://members-ng.iracing.com/data/member/get"
 
-    client := &http.Client{
-        Jar: c.CookieJar,
-    }
+    c.Client.Jar = c.CookieJar
 
     req, err := http.NewRequest("GET", uri, nil)
 
@@ -24,7 +22,7 @@ func (c *Client) GetMember(custId int) error {
 
     req.URL.RawQuery = fmt.Sprintf("cust_ids=%d", custId)
 
-    resp, err := client.Do(req)
+    resp, err := c.Client.Do(req)
 
     if err != nil {
         return err
