@@ -2,35 +2,24 @@ package client
 
 import (
 	"fmt"
-	"io"
-	"log"
-	"net/http"
+
+	"github.com/jawee/ir-webapi-client/client/response"
 )
 
-func (c *Client) GetSession(subsessionId int) error {
+func (c *Client) GetSession(subsessionId int) (*response.Session, error) {
     uri := fmt.Sprintf("https://members-ng.iracing.com/data/results/get?subsession_id=%d", subsessionId)
-    c.Client.Jar = c.CookieJar
 
-    req, err := http.NewRequest("GET", uri, nil)
-
-    if err != nil {
-        return err
-    }
-
-    resp, err := c.Client.Do(req)
-
-    if err != nil {
-        return err
-    }
-
-    defer resp.Body.Close()
-
-    b, err := io.ReadAll(resp.Body)
+    linkResp, err := c.getLink(uri)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, err
 	}
 
-	fmt.Println(string(b))
+    var sessionResp response.Session
+    err = c.fetchLink(linkResp.Link, &sessionResp)
 
-    return nil;
+    if err != nil {
+        return nil, err
+    }
+
+    return &sessionResp, nil
 }
