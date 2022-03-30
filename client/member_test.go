@@ -28,24 +28,24 @@ func NewTestClient(fn RoundTripFunc) *Client {
 }
 
 func GetMemberSuccessFunc(req *http.Request) *http.Response {
-		// Test request parameters
-		if req.URL.String() == "https://members-ng.iracing.com/data/member/get?cust_ids=123" {
-			return &http.Response{
-				StatusCode: 200,
-				// Send response to be tested
-				Body: ioutil.NopCloser(bytes.NewBufferString(`{
+	// Test request parameters
+	if req.URL.String() == "https://members-ng.iracing.com/data/member/get?cust_ids=123" {
+		return &http.Response{
+			StatusCode: 200,
+			// Send response to be tested
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{
                     "link": "https://some-url.com"
                 }`)),
-				// Must be set to non-nil value or it panics
-				Header: make(http.Header),
-			}
+			// Must be set to non-nil value or it panics
+			Header: make(http.Header),
 		}
+	}
 
-		if req.URL.String() == "https://some-url.com" {
-			return &http.Response{
-				StatusCode: 200,
-				// Send response to be tested
-				Body:   ioutil.NopCloser(bytes.NewBufferString(`{
+	if req.URL.String() == "https://some-url.com" {
+		return &http.Response{
+			StatusCode: 200,
+			// Send response to be tested
+			Body: ioutil.NopCloser(bytes.NewBufferString(`{
                   "success": true,
                   "cust_ids": [
                     123
@@ -70,13 +70,29 @@ func GetMemberSuccessFunc(req *http.Request) *http.Response {
                     }
                   ]
                 }`)),
-				Header: make(http.Header),
-			}
+			Header: make(http.Header),
 		}
+	}
 
-		return &http.Response{
-			StatusCode: 404,
-		}
+	return &http.Response{
+		StatusCode: 401,
+		Body: ioutil.NopCloser(bytes.NewBufferString(`{
+              "error": "Unauthorized"
+            }`)),
+		Header: make(http.Header),
+	}
+}
+
+func TestGetMemberUnauthorized(t *testing.T) {
+    client := NewTestClient(GetMemberSuccessFunc)
+    resp, err := client.GetMember(124)
+    if err == nil {
+        t.Errorf("Error should be nil")
+    }
+
+    if resp != nil {
+        t.Errorf("Response is not nil")
+    }
 }
 
 func TestGetMember(t *testing.T) {
@@ -91,13 +107,13 @@ func TestGetMember(t *testing.T) {
 		t.Errorf("Error: %s", "Members is empty")
 	}
 
-    if len(resp.CustIds) == 0 {
-        t.Errorf("Error: %s", "cust_ids is empty")
-    }
+	if len(resp.CustIds) == 0 {
+		t.Errorf("Error: %s", "cust_ids is empty")
+	}
 
-    for _, member := range resp.Members {
-        if member.CustID != 123 {
-            t.Errorf("Error: %s", "CustID is not 123")
-        }
-    }
+	for _, member := range resp.Members {
+		if member.CustID != 123 {
+			t.Errorf("Error: %s", "CustID is not 123")
+		}
+	}
 }

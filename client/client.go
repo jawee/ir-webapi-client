@@ -3,6 +3,7 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -71,7 +72,6 @@ func (c *Client) get(url string, responseObj interface{}) error {
 	if err != nil {
 		return err
 	}
-    // log.Printf("%+v", linkResp)
 
     err = c.fetchLink(linkResp.Link, responseObj)
 
@@ -98,6 +98,10 @@ func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
         return nil, err
     }
 
+    if resp.StatusCode != 200 {
+        return nil, errors.New("Invalid response code")
+    }
+
     defer resp.Body.Close()
 
     b, err := io.ReadAll(resp.Body)
@@ -107,7 +111,7 @@ func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
     err = json.Unmarshal(b, &linkResp)
     
     if err != nil {
-        log.Fatalln(err)
+        return nil, err
     }
 
     return &linkResp, nil;
