@@ -2,7 +2,6 @@ package client
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/jawee/ir-webapi-client/client/response"
 )
@@ -30,7 +29,6 @@ func (c *Client) GetMemberRecentRaces(custId int) (*response.RecentRacesResponse
 
 	linkResp, err := c.getLink(uri)
 	if err != nil {
-		log.Fatalln(err)
         return nil, err
 	}
 
@@ -38,7 +36,6 @@ func (c *Client) GetMemberRecentRaces(custId int) (*response.RecentRacesResponse
 	err = c.fetchLink(linkResp.Link, &memberRecentRacesResp)
 
 	if err != nil {
-		log.Fatalln(err)
         return nil, err
 	}
 

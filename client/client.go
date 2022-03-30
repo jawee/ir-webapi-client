@@ -66,23 +66,20 @@ func (c *Client) Login(email, password string) error {
     return nil
 }
 
-func printBody(body io.ReadCloser) {
-    b, err := io.ReadAll(body)
+func (c *Client) get(url string, responseObj interface{}) error {
+    linkResp, err := c.getLink(url)
+	if err != nil {
+		return err
+	}
+    // log.Printf("%+v", linkResp)
+
+    err = c.fetchLink(linkResp.Link, responseObj)
 
     if err != nil {
-        log.Fatalln(err)
+        return err
     }
 
-    fmt.Println(string(b))
-}
-
-func printResp(resp *http.Response) {
-    respDump, err := httputil.DumpResponse(resp, true)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    fmt.Printf("RESPONSE:\n%s", string(respDump))
+    return nil
 }
 
 func (c *Client) getLink(uri string) (*response.LinkResponse, error) {
@@ -142,3 +139,22 @@ func (c *Client) fetchLink(uri string, resp interface{}) error {
 }
 
 
+func printBody(body io.ReadCloser) {
+    b, err := io.ReadAll(body)
+
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+    fmt.Println(string(b))
+}
+
+
+func printResp(resp *http.Response) {
+    respDump, err := httputil.DumpResponse(resp, true)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("RESPONSE:\n%s", string(respDump))
+}
