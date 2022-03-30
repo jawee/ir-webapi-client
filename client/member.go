@@ -9,13 +9,8 @@ import (
 func (c *Client) GetMember(custId int) (*response.MemberResponse, error) {
 	uri := fmt.Sprintf("https://members-ng.iracing.com/data/member/get?cust_ids=%d", custId)
 
-    linkResp, err := c.getLink(uri)
-	if err != nil {
-		return nil, err
-	}
-
     var memberResponse response.MemberResponse
-    err = c.fetchLink(linkResp.Link, &memberResponse)
+    err := c.get(uri, &memberResponse)
 
     if err != nil {
         return nil, err
@@ -27,13 +22,8 @@ func (c *Client) GetMember(custId int) (*response.MemberResponse, error) {
 func (c *Client) GetMemberRecentRaces(custId int) (*response.RecentRacesResponse, error) {
 	uri := fmt.Sprintf("https://members-ng.iracing.com/data/stats/member_recent_races?cust_id=%d", custId)
 
-	linkResp, err := c.getLink(uri)
-	if err != nil {
-        return nil, err
-	}
-
 	var memberRecentRacesResp response.RecentRacesResponse
-	err = c.fetchLink(linkResp.Link, &memberRecentRacesResp)
+    err := c.get(uri, &memberRecentRacesResp)
 
 	if err != nil {
         return nil, err
