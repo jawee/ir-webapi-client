@@ -31,3 +31,15 @@ func (c *Client) GetMemberSummary(custId int) (*response.MemberSummary, error) {
 
     return &memberSummaryResp, nil
 }
+
+func (c *Client) GetMemberYearly(custId int) (*response.MemberYearly, error) {
+    uri := fmt.Sprintf("https://members-ng.iracing.com/data/stats/member_yearly?cust_id=%d", custId)
+    var memberYearlyResp response.MemberYearly
+    err := c.get(uri, &memberYearlyResp)
+
+    if err != nil {
+        return nil, err
+    }
+
+    return &memberYearlyResp, nil
+}
