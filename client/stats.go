@@ -18,3 +18,16 @@ func (c *Client) GetMemberRecentRaces(custId int) (*response.RecentRacesResponse
 
 	return &memberRecentRacesResp, nil
 }
+
+func (c *Client) GetMemberSummary(custId int) (*response.MemberSummary, error) {
+    uri := fmt.Sprintf("https://members-ng.iracing.com/data/stats/member_summary?cust_id=%d", custId)
+
+    var memberSummaryResp response.MemberSummary
+    err := c.get(uri, &memberSummaryResp)
+
+    if err != nil {
+        return nil, err
+    }
+
+    return &memberSummaryResp, nil
+}
