@@ -262,8 +262,8 @@ func TestGetCar(t *testing.T) {
 		t.Errorf("Response is nil")
 	}
 
-    if len(resp.Cars) != 3 {
-        t.Errorf("Expected 3 cars, got %d", len(resp.Cars))
-    }
+	if len(resp.Cars) != 3 {
+		t.Errorf("Expected 3 cars, got %d", len(resp.Cars))
+	}
 
 }

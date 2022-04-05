@@ -5,33 +5,33 @@ import (
 )
 
 func (c *Client) GetCarAssets() (*response.CarAssetsResponse, error) {
-    uri := "https://members-ng.iracing.com/data/car/assets"
-    var carAssets map[string] response.CarAssets
-    err := c.get(uri, &carAssets)
+	uri := "https://members-ng.iracing.com/data/car/assets"
+	var carAssets map[string]response.CarAssets
+	err := c.get(uri, &carAssets)
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    resp := response.CarAssetsResponse{
-        CarAssets: carAssets,
-    }
+	resp := response.CarAssetsResponse{
+		CarAssets: carAssets,
+	}
 
-    return &resp, nil
+	return &resp, nil
 }
 
 func (c *Client) GetCars() (*response.CarsResponse, error) {
-    uri := "https://members-ng.iracing.com/data/car/get"
-    var cars []response.Car
-    err := c.get(uri, &cars)
+	uri := "https://members-ng.iracing.com/data/car/get"
+	var cars []response.Car
+	err := c.get(uri, &cars)
 
-    if err != nil {
-        return nil, err
-    }
+	if err != nil {
+		return nil, err
+	}
 
-    resp := response.CarsResponse{
-        Cars: cars,
-    }
+	resp := response.CarsResponse{
+		Cars: cars,
+	}
 
-    return &resp, nil
+	return &resp, nil
 }

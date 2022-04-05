@@ -84,15 +84,15 @@ func GetMemberSuccessFunc(req *http.Request) *http.Response {
 }
 
 func TestGetMemberUnauthorized(t *testing.T) {
-    client := NewTestClient(GetMemberSuccessFunc)
-    resp, err := client.GetMember(124)
-    if err == nil {
-        t.Errorf("Error should be nil")
-    }
+	client := NewTestClient(GetMemberSuccessFunc)
+	resp, err := client.GetMember(124)
+	if err == nil {
+		t.Errorf("Error should be nil")
+	}
 
-    if resp != nil {
-        t.Errorf("Response is not nil")
-    }
+	if resp != nil {
+		t.Errorf("Response is not nil")
+	}
 }
 
 func TestGetMember(t *testing.T) {
