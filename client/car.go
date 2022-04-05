@@ -4,9 +4,6 @@ import (
 	"github.com/jawee/ir-webapi-client/client/response"
 )
 
-// https://members-ng.iracing.com/data/car/assets
-
-// func (c *Client) GetCarAssets() (*map[string] response.CarAssets, error) {
 func (c *Client) GetCarAssets() (*response.CarAssetsResponse, error) {
     uri := "https://members-ng.iracing.com/data/car/assets"
     var carAssets map[string] response.CarAssets
@@ -23,3 +20,18 @@ func (c *Client) GetCarAssets() (*response.CarAssetsResponse, error) {
     return &resp, nil
 }
 
+func (c *Client) GetCars() (*response.CarsResponse, error) {
+    uri := "https://members-ng.iracing.com/data/car/get"
+    var cars []response.Car
+    err := c.get(uri, &cars)
+
+    if err != nil {
+        return nil, err
+    }
+
+    resp := response.CarsResponse{
+        Cars: cars,
+    }
+
+    return &resp, nil
+}
