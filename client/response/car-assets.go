@@ -17,8 +17,3 @@ type CarAssets struct {
 	SponsorLogo            string     `json:"sponsor_logo"`
 	TemplatePath           string     `json:"template_path"`
 }
-
-type CarRules struct {
-	RuleCategory string `json:"rule_category"`
-	Text         string `json:"text"`
-}

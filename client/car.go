@@ -6,15 +6,20 @@ import (
 
 // https://members-ng.iracing.com/data/car/assets
 
-func (c *Client) GetCarAssets() (*map[string] response.CarAssets, error) {
+// func (c *Client) GetCarAssets() (*map[string] response.CarAssets, error) {
+func (c *Client) GetCarAssets() (*response.CarAssetsResponse, error) {
     uri := "https://members-ng.iracing.com/data/car/assets"
-    var carAssetsResponse map[string] response.CarAssets
-    err := c.get(uri, &carAssetsResponse)
+    var carAssets map[string] response.CarAssets
+    err := c.get(uri, &carAssets)
 
     if err != nil {
         return nil, err
     }
 
-    return &carAssetsResponse, nil
+    resp := response.CarAssetsResponse{
+        CarAssets: carAssets,
+    }
+
+    return &resp, nil
 }
 

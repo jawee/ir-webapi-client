@@ -103,4 +103,8 @@ func TestGetCarAssets(t *testing.T) {
 	if resp == nil {
 		t.Errorf("Response is nil")
 	}
+
+    if len(resp.CarAssets) != 2 {
+        t.Errorf("Expected 2 cars, got %d", len(resp.CarAssets))
+    }
 }
