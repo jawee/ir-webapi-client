@@ -2,7 +2,7 @@ package response
 
 import "time"
 
-type Car struct {
+type Car []struct {
 	AiEnabled               bool                 `json:"ai_enabled"`
 	AllowNumberColors       bool                 `json:"allow_number_colors"`
 	AllowNumberFont         bool                 `json:"allow_number_font"`

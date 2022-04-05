@@ -20,18 +20,14 @@ func (c *Client) GetCarAssets() (*response.CarAssetsResponse, error) {
 	return &resp, nil
 }
 
-func (c *Client) GetCars() (*response.CarsResponse, error) {
+func (c *Client) GetCars() (*response.Car, error) {
 	uri := "https://members-ng.iracing.com/data/car/get"
-	var cars []response.Car
+	var cars response.Car
 	err := c.get(uri, &cars)
 
 	if err != nil {
 		return nil, err
 	}
 
-	resp := response.CarsResponse{
-		Cars: cars,
-	}
-
-	return &resp, nil
+	return &cars, nil
 }
