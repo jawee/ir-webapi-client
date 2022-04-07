@@ -1,3 +1,3 @@
 module github.com/jawee/ir-webapi-client
 
-go 1.17
+go 1.18
